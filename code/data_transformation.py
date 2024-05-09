@@ -5,7 +5,7 @@ from sklearn.preprocessing import StandardScaler
 import numpy as np
 
 
-df_transformed = pd.read_csv("../data/heart_2022_cleaned_with_outliers.csv")
+df_transformed = pd.read_csv("../data/heart_2022_cleaned_removed_outliers.csv")
 
 pd.set_option('display.max_columns', None)
 
@@ -102,7 +102,7 @@ df_transformed["ECigaretteUsage"] = df_transformed["ECigaretteUsage"].replace(
 )
 df_transformed.head()
 
-df_transformed.to_csv("../data/heart_2022_transformed_with_outliers.csv")
+df_transformed.to_csv("../data/heart_2022_transformed_no_outliers.csv",index=False)
 
 
 
