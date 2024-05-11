@@ -2,35 +2,57 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-df = pd.read_csv("../data/heart_2022_removed_columns.csv")
+df = pd.read_csv("../data/processed/heart_2022.csv")
 
-pd.set_option('display.max_columns', None)
+# Making a copy from the original dataframe:
+df_cleaned = df.copy()
 
-df.info()
-
-df.head()
-
+# We decided to drop all the NaN values, since they're only a fraction of the dataset:
+df_cleaned.info()
 df_cleaned = df.dropna()
 
-df_cleaned.info()
 
-df_cleaned.head()
+""" 
+Assuming the presence of Heart Disease is indicated 
+by any "Yes" in these three Heart conditions.
+
+We create a new column called "HadHeartDisease" derived from the three Heart conditions.
+"""
+df_cleaned["HadHeartDisease"] = (
+    (df_cleaned["HadHeartAttack"] == "Yes")
+    | (df_cleaned["HadAngina"] == "Yes")
+    | (df_cleaned["HadStroke"] == "Yes")
+).astype(int)
+
+""" 
+We decided to drop "HeightInMeters" and "WeightInKilograms" since "BMI" will give
+a better overall representation of those two columns.
+
+We also drop the three previous Heart conditions from the data,
+since we now have "HadHeartDisease" instead.
+"""
+df_cleaned.drop(
+    columns=[
+        "HeightInMeters",
+        "WeightInKilograms",
+        "HadHeartAttack",
+        "HadAngina",
+        "HadStroke",
+    ],
+    inplace=True,
+)
 
 
+## Identifying and removing outliers ##
 
-# Assuming the presence of heart disease is indicated by any 'Yes' in these three columns
-df_cleaned['HadHeartDisease'] = ((df_cleaned['HadHeartAttack'] == 'Yes') | 
-                          (df_cleaned['HadAngina'] == 'Yes') | 
-                          (df_cleaned['HadStroke'] == 'Yes')).astype(int)
+""" 
+These 4 columns will help us identify outliers,
+since their datatypes are suitable.
 
-df_cleaned.drop(columns=["HeightInMeters","WeightInKilograms","HadHeartAttack","HadAngina","HadStroke"],inplace=True)
+"""
+columns_to_plot = ["PhysicalHealthDays", "MentalHealthDays", "SleepHours", "BMI"]
 
-df_cleaned
-
-# Columns suitable for box plots based on their data type
-columns_to_plot = ['PhysicalHealthDays', 'MentalHealthDays', 'SleepHours','BMI']
-
-# Plotting
+# These box plots will display the outliers outside the whiskers:
 plt.figure(figsize=(15, 5))
 for i, column in enumerate(columns_to_plot, 1):
     plt.subplot(1, len(columns_to_plot), i)
@@ -41,8 +63,7 @@ plt.tight_layout()
 plt.show()
 
 
-
-# Removing Outliers using the IQR Range (function used in OLA-1):
+# Removing Outliers using the IQR Range:
 def remove_outliers_iqr(dataset, col):
     """
     Function to mark values as outliers using the IQR (Interquartile Range) method.
@@ -72,26 +93,30 @@ def remove_outliers_iqr(dataset, col):
 
 
 # Removing outliers for each column:
-columns_to_remove_outliers = ["BMI", "SleepHours", "PhysicalHealthDays","MentalHealthDays"]
+columns_to_remove_outliers = [
+    "BMI",
+    "SleepHours",
+    "PhysicalHealthDays",
+    "MentalHealthDays",
+]
 for column in columns_to_remove_outliers:
     df_no_outliers = remove_outliers_iqr(df_cleaned, column)
-    
+
 df_no_outliers.info()
 
-df_no_outliers.to_csv("../data/heart_2022_cleaned_removed_outliers.csv",index=False)
+""" 
+We have decided to keep the outliers, since they may be significant in
+our project about Heart Disease. The IQR method above is the technique we would've applied,
+if we decided to remove outliers.
 
-# Checking the NaN Count again to assure the outliers has been removed.
-df_cleaned.info()
+We decided to test with and without outliers, and the model gave the best
+results with outliers, which also showcase the real world, where the majority does not
+have a Heart condition and therefore might the outliers help us identify the chance of
+getting a Heart Disease.
+"""
 
-df_cleaned.to_csv("../data/heart_2022_cleaned_with_outliers.csv",index=False)
+# Saving csv file with outliers.
+df_cleaned.to_csv("../data/processed/heart_2022_cleaned", index=False)
 
-
-
-# Continue from the filtering step as before
-#heavy_individuals = df_cleaned[df_cleaned['PhysicalHealthDays'] > 20]
-#heart_disease_count = heavy_individuals['HadHeartDisease'].value_counts()
-
-#print("Distribution of heart disease among individuals weighing more than 250kg:")
-#print(heart_disease_count)
-
-
+# Saving csv file for no outliers:
+# df_no_outliers.to_csv("../data/heart_2022_cleaned", index=False)
