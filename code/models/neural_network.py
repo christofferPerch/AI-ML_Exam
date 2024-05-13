@@ -8,6 +8,7 @@ from tensorflow.keras.layers import Dense, Dropout, BatchNormalization
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras.metrics import Precision, Recall
 from tensorflow.keras.callbacks import LearningRateScheduler
+import pickle as pkl
 
 
 # Here we make a custom learning rate scheduler function:
@@ -74,12 +75,16 @@ callbacks = [reduce_lr, early_stopping, lr_scheduler]
 history = model.fit(
     X_train_resampled,
     y_train_resampled,
-    epochs=100,
+    epochs=5,
     validation_data=(X_test, y_test),
     callbacks=callbacks,
     batch_size=64,
     verbose=1,
 )
+
+
+# Save the TensorFlow model to a directory
+model.save("../models/saved_models/model_tensorflow.keras")
 
 
 """ All results can be found inside the directory "./results/model_results.py". """

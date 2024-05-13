@@ -52,6 +52,7 @@ def perform_stratified_cv(model, X, y, n_splits=2, sample_frac=1.0):
         # Prints the classification report for the current fold:
         print(f"\nClassification Report for Fold {i+1}:\n")
         print(classification_report(y_test_fold, y_pred))
+        return model_clone
 
 
 # Random Oversampling method:

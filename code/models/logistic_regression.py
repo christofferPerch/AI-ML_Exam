@@ -2,7 +2,7 @@ import pandas as pd
 import importlib
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-import code.models.features.oversampling as oversampling
+import features.oversampling as oversampling
 from sklearn.metrics import classification_report
 
 # Reloads the oversampling module to ensure the latest version is used:
@@ -58,5 +58,10 @@ percentage = proba_positive_class * 100
 # Here we apply SMOTE for oversampling and evaluates:
 oversampling.perform_smote_oversampling(log_reg_model, X_train, X_test, y_train, y_test)
 
+import pickle
 
+# Save the model(oversampling model) to a file
+with open("../models/saved_models/model_logistic_regression.pkl", "wb") as file:
+    pickle.dump(log_regressor, file)
+    
 """ All results can be found inside the directory "./results/model_results.py". """
