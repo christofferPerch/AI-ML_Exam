@@ -51,7 +51,6 @@ plt.show()
 
 # Creating bar charts for HadHeartAttack, HadAngina, HadStroke
 
-
 # These three bar charts will help to identify the distribution of the three types of heart conditions:
 plt.figure(figsize=(15, 5))
 
