@@ -2,15 +2,16 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
-from langchain_openai import ChatOpenAI  
+from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain.embeddings.openai import OpenAIEmbeddings
 from dotenv import load_dotenv
 from langchain_pinecone import PineconeVectorStore
 import os
+
 load_dotenv()
-pinecone_api_key = os.getenv('PINECONE_API_KEY')
-openai_api_key = os.getenv('OPENAI_API_KEY')
+pinecone_api_key = os.getenv("PINECONE_API_KEY")
+openai_api_key = os.getenv("OPENAI_API_KEY")
 
 index_name = "heartdisease"
 embeddings = OpenAIEmbeddings()
@@ -28,22 +29,40 @@ embeddings = OpenAIEmbeddings()
 # vectorstore = PineconeVectorStore.from_documents(
 #         split,
 #         index_name=index_name,
-#         embedding=embeddings,      
+#         embedding=embeddings,
 #     )
 
+heart_disease_keywords = [
+    "cardiovascular",
+    "heart",
+    "artery",
+    "hypertension",
+    "cholesterol",
+    "myocardial",
+    "angina",
+]
+
+
+def is_question_relevant(question):
+    """Check if the question contains any of the keywords related to heart disease."""
+    question_lower = question.lower()
+    return any(keyword in question_lower for keyword in heart_disease_keywords)
+
+
 def chat(input):
+    if not is_question_relevant(input):
+        return "I don't have information on that topic. Thanks for asking, master!"
+
     vectorstore = PineconeVectorStore.from_existing_index(
-            index_name=index_name,
-            embedding=embeddings,      
+        index_name=index_name,
+        embedding=embeddings,
     )
 
     retriever = vectorstore.as_retriever()
 
-    llm = ChatOpenAI(  
-        openai_api_key=openai_api_key,  
-        model_name='gpt-4-turbo',  
-        temperature=0.0  
-    )  
+    llm = ChatOpenAI(
+        openai_api_key=openai_api_key, model_name="gpt-4-turbo", temperature=0.0
+    )
 
     template = """Use the following pieces of context to answer the question at the end.
     If you don't know the answer, just say that you don't know, don't try to make up an answer!!!.
@@ -74,3 +93,5 @@ def chat(input):
     return rag_chain.invoke(input)
 
 
+response = chat("What is a heart")
+print(response)

@@ -16,7 +16,7 @@ def genai_embed():
 @app.route('/genai_chat', methods=['POST'])
 def genai_chat():
     
-    return chatbot.chat("What is a ferrari?")
+    return chatbot.chat("What is a human heart")
 
 
 
