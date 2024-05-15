@@ -5,6 +5,7 @@ from sklearn.preprocessing import StandardScaler
 from tensorflow.keras.models import load_model
 import pipeline 
 import chatbot
+from pymongo import MongoClient
 
 app = Flask(__name__)
 
@@ -14,11 +15,31 @@ def genai_embed():
     return "hafla"
 
 @app.route('/genai_chat', methods=['POST'])
+
 def genai_chat():
     
-    return chatbot.chat("What is a human heart")
+    data = request.get_json()
+    question = data['message']  
+    response = chatbot.chat(question)  
+    return jsonify({"response": response})
 
 
+def get_latest_model():
+    client = MongoClient('mongodb://localhost:27017/')
+    db = client['heart_disease']
+    collection = db['machineLearningModels']
+
+    # Retrieve the latest model by sorting by version in descending order
+    latest_model_entry = collection.find_one(
+        {"model_name": "logistic_regression"},
+        sort=[("version", -1)]
+    )
+    
+    if latest_model_entry:
+        model = pickle.loads(latest_model_entry['model'])
+        return model
+    else:
+        raise ValueError("No model found in the database.")
 
 @app.route('/predict_lr', methods=['POST'])
 def predict_logistic_regression():
@@ -28,9 +49,8 @@ def predict_logistic_regression():
     # Transform data
     transformed_data = pipeline.transform_data(data)
     
-    # Load the trained model from the file
-    with open("../models/saved_models/model_logistic_regression.pkl", "rb") as file:
-        model = pickle.load(file)
+    # Load the latest model from MongoDB
+    model = get_latest_model()
     
     # Make prediction
     prediction = model.predict_proba(transformed_data)

@@ -4,6 +4,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 import features.oversampling as oversampling
 from sklearn.metrics import classification_report
+import pickle
 
 # Reloads the oversampling module to ensure the latest version is used:
 importlib.reload(oversampling)
@@ -37,8 +38,11 @@ print(classification_report(y_test, y_pred))
 
 ## STRATIFIED SAMPLING ##
 # We perform stratified cross-validation:
-oversampling.perform_stratified_cv(log_reg_model, X, y)
+# oversampling.perform_stratified_cv(log_reg_model, X, y)
 
+## SMOTE ##
+# Here we apply SMOTE for oversampling and evaluates:
+# oversampling.perform_smote_oversampling(log_reg_model, X_train, X_test, y_train, y_test)
 
 ## RANDOM OVERSAMPLING ##
 # Here we apply random oversampling to the training set and evaluates it:
@@ -54,11 +58,6 @@ proba_positive_class = proba[:, 1]
 
 percentage = proba_positive_class * 100
 
-## SMOTE ##
-# Here we apply SMOTE for oversampling and evaluates:
-oversampling.perform_smote_oversampling(log_reg_model, X_train, X_test, y_train, y_test)
-
-import pickle
 
 # Save the model(oversampling model) to a file
 with open("../models/saved_models/model_logistic_regression.pkl", "wb") as file:

@@ -61,7 +61,7 @@ def chat(input):
     retriever = vectorstore.as_retriever()
 
     llm = ChatOpenAI(
-        openai_api_key=openai_api_key, model_name="gpt-4-turbo", temperature=0.0
+        openai_api_key=openai_api_key, model_name="gpt-3.5-turbo", temperature=0.0
     )
 
     template = """Use the following pieces of context to answer the question at the end.
