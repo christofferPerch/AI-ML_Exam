@@ -4,8 +4,20 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from tensorflow.keras.models import load_model
 import pipeline 
+import chatbot
 
 app = Flask(__name__)
+
+@app.route('/genai_embed', methods=['POST'])
+def genai_embed():
+    
+    return "hafla"
+
+@app.route('/genai_chat', methods=['POST'])
+def genai_chat():
+    
+    return chatbot.chat("What is a ferrari?")
+
 
 
 @app.route('/predict_lr', methods=['POST'])
@@ -25,7 +37,7 @@ def predict_logistic_regression():
     percentage = prediction[:, 1] * 100
     
     # Return the prediction as JSON
-    return jsonify({'prediction': f"{percentage.item():.2f}% probability of having the condition"})
+    return jsonify({'prediction': f"{percentage.item():.2f}% probability of getting a heart disease."})
 
 @app.route('/predict_rf', methods=['POST'])
 def predict_random_forest():
@@ -44,7 +56,7 @@ def predict_random_forest():
     percentage = prediction[:, 1] * 100
     
     # Return the prediction as JSON
-    return jsonify({'prediction': f"{percentage.item():.2f}% probability of having the condition"})
+    return jsonify({'prediction': f"{percentage.item():.2f}% probability of getting a heart disease."})
 
 @app.route('/predict_tf', methods=['POST'])
 def predict_tensorflow():
@@ -63,7 +75,7 @@ def predict_tensorflow():
     percentage = prediction * 100
     
     # Return the prediction as JSON
-    return jsonify({'prediction': f"{percentage.item():.2f}% probability of having the condition"})
+    return jsonify({'prediction': f"{percentage.item():.2f}% probability of getting a heart disease."})
 
 
 
