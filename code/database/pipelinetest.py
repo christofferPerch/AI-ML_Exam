@@ -10,7 +10,9 @@ def transform_data(data):
     #numeric_cols = ["PhysicalHealthDays", "MentalHealthDays", "SleepHours", "BMI"]
     #scaler = StandardScaler()
     #df_transformed[numeric_cols] = scaler.fit_transform(df_transformed[numeric_cols])
-
+    numeric_cols = ["PhysicalHealthDays", "MentalHealthDays", "SleepHours", "BMI"]
+    scaler = StandardScaler()
+    df_transformed[numeric_cols] = scaler.fit_transform(df_transformed[numeric_cols])
     df_transformed.head()
 
     df_transformed = df_transformed.replace({"No": 0, "Yes": 1})
