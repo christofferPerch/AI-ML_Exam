@@ -4,15 +4,17 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from tensorflow.keras.models import load_model
 import pipeline 
-import chatbot
+import chatbot_chat 
+import chatbot_training
 from pymongo import MongoClient
 
 app = Flask(__name__)
 
 @app.route('/genai_embed', methods=['POST'])
 def genai_embed():
-    
-    return "hafla"
+    chatbot_training.train_chatbot()
+    return jsonify({"message": "Embedding process completed successfully."})
+
 
 @app.route('/genai_chat', methods=['POST'])
 
@@ -20,7 +22,7 @@ def genai_chat():
     
     data = request.get_json()
     question = data['message']  
-    response = chatbot.chat(question)  
+    response = chatbot_chat.chat(question)  
     return jsonify({"response": response})
 
 
