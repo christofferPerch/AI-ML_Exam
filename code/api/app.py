@@ -8,6 +8,8 @@ import chatbot_chat
 import chatbot_training
 from pymongo import MongoClient
 from retrain_logistic_regression import train_and_save_model
+from retrain_random_forest import train_and_save_model as train_and_save_model_rf
+from retrain_tensorflow import train_and_save_model as train_and_save_model_tf
 
 
 app = Flask(__name__)
@@ -21,7 +23,6 @@ def genai_embed():
 
 @app.route("/genai_chat", methods=["POST"])
 def genai_chat():
-
     data = request.get_json()
     question = data["message"]
     response = chatbot_chat.chat(question)
@@ -115,10 +116,28 @@ def predict_tensorflow():
     )
 
 
-@app.route("/retrain_model", methods=["POST"])
-def retrain_model():
+@app.route("/retrain_lr", methods=["GET"])
+def retrain_model_lr():
     try:
         train_and_save_model()
+        return jsonify({"message": "Model retrained and saved successfully."})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/retrain_rf", methods=["GET"])
+def retrain_model_rf():
+    try:
+        train_and_save_model_rf()
+        return jsonify({"message": "Model retrained and saved successfully."})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/retrain_tf", methods=["GET"])
+def retrain_model_tf():
+    try:
+        train_and_save_model_tf()
         return jsonify({"message": "Model retrained and saved successfully."})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
