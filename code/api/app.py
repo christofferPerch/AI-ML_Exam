@@ -1,7 +1,12 @@
+import io
+import os
+import tempfile
 from flask import Flask, request, jsonify
 import pickle
+import gridfs
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
+import tensorflow as tf
 from tensorflow.keras.models import load_model
 import pipeline
 import chatbot.chatbot_chat as chatbot_chat
@@ -33,21 +38,45 @@ def genai_chat():
     return jsonify({"response": response})
 
 
-def get_latest_model():
+def get_latest_model(model_name):
     client = MongoClient("mongodb://localhost:27017/")
     db = client["heart_disease"]
     collection = db["machineLearningModels"]
+    # fs = gridfs.GridFS(db)
 
     # Retrieve the latest model by sorting by version in descending order
     latest_model_entry = collection.find_one(
-        {"model_name": "logistic_regression"}, sort=[("version", -1)]
+        {"model_name": model_name}, sort=[("version", -1)]
     )
 
     if latest_model_entry:
-        model = pickle.loads(latest_model_entry["model"])
+        if model_name == "tensorflow":
+            # Create a temporary file and write the model to it
+            with open("temp.keras", "wb") as tmp:
+                tmp.write(latest_model_entry["model"])
+
+            # Load the model from the temporary file
+            model = tf.keras.models.load_model("temp.keras")
+
+            # Delete the temporary file
+            os.remove("temp.keras")
+        if model_name == "random_forest":
+            fs = gridfs.GridFS(db)
+            grid_out = fs.get(latest_model_entry["model_id"])
+            with open("temp.pkl", "wb") as tmp:
+                tmp.write(grid_out.read())
+
+            model = pickle.loads(open("temp.pkl", "rb").read())
+            # Delete the temporary file
+            os.remove("temp.pkl")
+        if model_name == "logistic_regression":
+            model = pickle.loads(latest_model_entry["model"])
         return model
     else:
         raise ValueError("No model found in the database.")
+
+
+test = get_latest_model("random_forest")
 
 
 @app.route("/predict_lr", methods=["POST"])
@@ -59,7 +88,7 @@ def predict_logistic_regression():
     transformed_data = pipeline.transform_data(data)
 
     # Load the latest model from MongoDB
-    model = get_latest_model()
+    model = get_latest_model("logistic_regression")
 
     # Make prediction
     prediction = model.predict_proba(transformed_data)
@@ -82,8 +111,9 @@ def predict_random_forest():
     transformed_data = pipeline.transform_data(data)
 
     # Load the trained model from the file
-    with open("../models/saved_models/model_random_forest.pkl", "rb") as file:
-        model = pickle.load(file)
+    # with open("../models/saved_models/model_random_forest.pkl", "rb") as file:
+    #     model = pickle.load(file)
+    model = get_latest_model("random_forest")
 
     # Make prediction
     prediction = model.predict_proba(transformed_data)
@@ -106,7 +136,8 @@ def predict_tensorflow():
     transformed_data = pipeline.transform_data(data)
 
     # Load the trained model from the file
-    model = load_model("../models/saved_models/model_tensorflow.keras")
+    # model = load_model("../models/saved_models/model_tensorflow.keras")
+    model = get_latest_model("tensorflow")
 
     # Make prediction
     prediction = model.predict(transformed_data)
