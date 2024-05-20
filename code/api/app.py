@@ -4,12 +4,16 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from tensorflow.keras.models import load_model
 import pipeline
-import chatbot_chat
-import chatbot_training
+import chatbot.chatbot_chat as chatbot_chat
+import chatbot.chatbot_training as chatbot_training
 from pymongo import MongoClient
-from retrain_logistic_regression import train_and_save_model
-from retrain_random_forest import train_and_save_model as train_and_save_model_rf
-from retrain_tensorflow import train_and_save_model as train_and_save_model_tf
+from retrain.retrain_logistic_regression import (
+    train_and_save_model as train_and_save_model,
+)
+from retrain.retrain_random_forest import (
+    train_and_save_model as train_and_save_model_rf,
+)
+from retrain.retrain_tensorflow import train_and_save_model as train_and_save_model_tf
 
 
 app = Flask(__name__)
