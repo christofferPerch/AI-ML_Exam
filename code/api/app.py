@@ -76,7 +76,7 @@ def get_latest_model(model_name):
         raise ValueError("No model found in the database.")
 
 
-test = get_latest_model("random_forest")
+#test = get_latest_model("random_forest")
 
 
 @app.route("/predict_lr", methods=["POST"])
