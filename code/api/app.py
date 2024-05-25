@@ -19,7 +19,11 @@ from retrain.retrain_random_forest import (
     train_and_save_model as train_and_save_model_rf,
 )
 from retrain.retrain_tensorflow import train_and_save_model as train_and_save_model_tf
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
+mongodb_url = os.getenv("MONGODB_URL")
 
 app = Flask(__name__)
 
@@ -39,7 +43,7 @@ def genai_chat():
 
 
 def get_latest_model(model_name):
-    client = MongoClient("mongodb://localhost:27017/")
+    client = MongoClient(mongodb_url)
     db = client["heart_disease"]
     collection = db["machineLearningModels"]
     # fs = gridfs.GridFS(db)
@@ -76,7 +80,7 @@ def get_latest_model(model_name):
         raise ValueError("No model found in the database.")
 
 
-#test = get_latest_model("random_forest")
+# test = get_latest_model("random_forest")
 
 
 @app.route("/predict_lr", methods=["POST"])

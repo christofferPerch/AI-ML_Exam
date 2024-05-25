@@ -14,6 +14,12 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.base import clone
 from imblearn.over_sampling import RandomOverSampler
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+mongodb_url = os.getenv("MONGODB_URL")
+
 
 def perform_stratified_cv(model, X, y, n_splits=2, sample_frac=1.0):
     # Initializing stratified k-folds:
@@ -97,7 +103,7 @@ def train_and_save_model():
     random_forest = perform_stratified_cv(rf_classifier, X, y)
 
     # Save model to MongoDB
-    client = MongoClient("mongodb://localhost:27017/")
+    client = MongoClient(mongodb_url)
     db = client["heart_disease"]
     collection = db["machineLearningModels"]
     fs = GridFS(db)

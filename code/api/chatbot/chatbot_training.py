@@ -7,11 +7,22 @@ from dotenv import load_dotenv
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders.csv_loader import CSVLoader
-from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader, TextLoader, UnstructuredExcelLoader
+from langchain_community.document_loaders import (
+    PyPDFLoader,
+    Docx2txtLoader,
+    TextLoader,
+    UnstructuredExcelLoader,
+)
 from langchain.docstore.document import Document
 from langchain_pinecone import PineconeVectorStore
 import os
 from pinecone import Pinecone, ServerlessSpec
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+mongodb_url = os.getenv("MONGODB_URL")
+
 
 def train_chatbot():
     load_dotenv()
@@ -25,7 +36,7 @@ def train_chatbot():
     # Initialize Pinecone
     pc = Pinecone(api_key=pinecone_api_key)
 
-    # Deletes current index so we get a fresh index with the new data 
+    # Deletes current index so we get a fresh index with the new data
     pc.delete_index(index_name)
 
     # Create a new index
@@ -33,14 +44,11 @@ def train_chatbot():
         name=index_name,
         dimension=1536,
         metric="cosine",
-        spec=ServerlessSpec(
-            cloud="aws",
-            region="us-east-1"
-        )
+        spec=ServerlessSpec(cloud="aws", region="us-east-1"),
     )
 
     # Loading data from MongoDB
-    client = MongoClient("mongodb://localhost:27017/")
+    client = MongoClient(mongodb_url)
     db = client["heart_disease"]
     fs = gridfs.GridFS(db)
 
@@ -91,15 +99,21 @@ def train_chatbot():
     for file in files:
         grid_out = fs.get(file._id)
         file_content = grid_out.read()
-        extension = file.filename.split('.')[-1].lower()
+        extension = file.filename.split(".")[-1].lower()
 
         try:
             loaded_content = load_file_content(io.BytesIO(file_content), extension)
             for content in loaded_content:
                 if isinstance(content, Document):
-                    doc = Document(page_content=content.page_content, metadata={"filename": file.filename})
+                    doc = Document(
+                        page_content=content.page_content,
+                        metadata={"filename": file.filename},
+                    )
                 else:
-                    doc = Document(page_content=content['text'], metadata={"filename": file.filename})
+                    doc = Document(
+                        page_content=content["text"],
+                        metadata={"filename": file.filename},
+                    )
                 documents.append(doc)
         except ValueError as e:
             print(e)

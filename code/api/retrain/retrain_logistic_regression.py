@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 
 # from sqlalchemy import create_engine
@@ -7,6 +8,10 @@ import pickle
 from pymongo import MongoClient
 from load_data_from_mssql import load_data_from_sql
 from pipelinetest import transform_data
+from dotenv import load_dotenv
+
+load_dotenv()
+mongodb_url = os.getenv("MONGODB_URL")
 
 df = load_data_from_sql()
 
@@ -47,7 +52,7 @@ def train_and_save_model():
     log_reg_model.fit(X_train, y_train)
 
     # Save model to MongoDB
-    client = MongoClient("mongodb://localhost:27017/")
+    client = MongoClient(mongodb_url)
     db = client["heart_disease"]
     collection = db["machineLearningModels"]
 
