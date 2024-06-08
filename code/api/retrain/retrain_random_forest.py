@@ -1,31 +1,29 @@
-import pandas as pd
+import os
 from gridfs import GridFS
-
-# from sqlalchemy import create_engine
-from sklearn.model_selection import train_test_split
+from dotenv import load_dotenv
 import pickle
+
+from sklearn.model_selection import train_test_split
 from pymongo import MongoClient
 
-# import code.models.features.oversampling as oversampling
 from sklearn.ensemble import RandomForestClassifier
-from load_data_from_mssql import load_data_from_sql
-from pipelinetest import transform_data
 from sklearn.model_selection import StratifiedKFold
 from sklearn.base import clone
 from imblearn.over_sampling import RandomOverSampler
 
-import os
-from dotenv import load_dotenv
+from ..load_data_from_mssql import load_data_from_sql
+from ...data_wrangling.data_transformation import transform_data
+
 
 load_dotenv()
 mongodb_url = os.getenv("MONGODB_URL")
 
 
 def perform_stratified_cv(model, X, y, n_splits=2, sample_frac=1.0):
-    # Initializing stratified k-folds:
+    # Here we initialize stratified k-folds:
     stratified_kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
 
-    # Iterates over each fold, and splits features and target unti training and test sets:
+    # We then iterates over each fold, and splits features and target training and test sets:
     for i, (train_index, test_index) in enumerate(stratified_kfold.split(X, y)):
         X_train_fold, X_test_fold = X.iloc[train_index], X.iloc[test_index]
         y_train_fold, y_test_fold = y.iloc[train_index], y.iloc[test_index]
@@ -44,9 +42,6 @@ def perform_stratified_cv(model, X, y, n_splits=2, sample_frac=1.0):
         # Here it clones the model on the training subset, and predicts the target for the test fold:
         model_clone.fit(X_train_sample, y_train_sample)
 
-        # Prints the classification report for the current fold:
-        # print(f"\nClassification Report for Fold {i+1}:\n")
-        # print(classification_report(y_test_fold, y_pred))
         return model_clone
 
 

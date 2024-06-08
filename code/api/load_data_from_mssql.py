@@ -21,7 +21,8 @@ def load_data_from_sql():
 
     # Load data into a pandas DataFrame
     df = pd.read_sql(query, engine)
-    df["HadHeartDisease"].fillna(True,inplace=True)
+    # df["HadHeartDisease"].fillna(True,inplace=True)
+    df.dropna(subset=["HadHeartDisease"], inplace=True)
     return df
 
 

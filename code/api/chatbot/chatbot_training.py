@@ -1,9 +1,10 @@
-# chatbot_training.py
-from pymongo import MongoClient
+import os
+from dotenv import load_dotenv
 import gridfs
 import io
 import tempfile
-from dotenv import load_dotenv
+
+from pymongo import MongoClient
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders.csv_loader import CSVLoader
@@ -15,10 +16,8 @@ from langchain_community.document_loaders import (
 )
 from langchain.docstore.document import Document
 from langchain_pinecone import PineconeVectorStore
-import os
 from pinecone import Pinecone, ServerlessSpec
-import os
-from dotenv import load_dotenv
+
 
 load_dotenv()
 mongodb_url = os.getenv("MONGODB_URL")
@@ -55,6 +54,7 @@ def train_chatbot():
     files = fs.find()
     documents = []
 
+    # Here we load the files depending on their extension, using the corresponding loader from LangChain.
     def load_file_content(file, extension):
         if extension == "csv":
             with tempfile.NamedTemporaryFile(delete=False, suffix=".csv") as temp_file:
@@ -96,6 +96,7 @@ def train_chatbot():
 
         return content
 
+    # Load files from MongoDB
     for file in files:
         grid_out = fs.get(file._id)
         file_content = grid_out.read()

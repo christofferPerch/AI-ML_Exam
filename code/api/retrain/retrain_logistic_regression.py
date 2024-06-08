@@ -1,14 +1,12 @@
 import os
-import pandas as pd
+from dotenv import load_dotenv
+import pickle
 
-# from sqlalchemy import create_engine
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-import pickle
 from pymongo import MongoClient
-from load_data_from_mssql import load_data_from_sql
-from pipelinetest import transform_data
-from dotenv import load_dotenv
+from ..load_data_from_mssql import load_data_from_sql
+from ...data_wrangling.data_transformation import transform_data
 
 load_dotenv()
 mongodb_url = os.getenv("MONGODB_URL")

@@ -1,5 +1,7 @@
-from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+import os
+import pandas as pd
+from sqlalchemy import create_engine
+
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain_openai import ChatOpenAI
@@ -7,9 +9,7 @@ from langchain.prompts import PromptTemplate
 from langchain.embeddings.openai import OpenAIEmbeddings
 from dotenv import load_dotenv
 from langchain_pinecone import PineconeVectorStore
-import os
-from sqlalchemy import create_engine
-import pandas as pd
+
 
 load_dotenv()
 pinecone_api_key = os.getenv("PINECONE_API_KEY")
@@ -29,12 +29,12 @@ def load_settings():
     # Define the query to select all columns except Id and CreatedAt
     query = """
         SELECT CB.[BasePrompt]
-      ,CB.[Temperature]
-      ,GM.[ModelName]
-  FROM [HeartDisease].[dbo].[ChatBotSettings] CB
-  INNER JOIN [HeartDisease].[dbo].[GPTModel] GM
-  ON CB.[GPTModelId] = GM.[Id]
-  WHERE CB.[Id] = 1 
+        ,CB.[Temperature]
+        ,GM.[ModelName]
+        FROM [HeartDisease].[dbo].[ChatBotSettings] CB
+        INNER JOIN [HeartDisease].[dbo].[GPTModel] GM
+        ON CB.[GPTModelId] = GM.[Id]
+        WHERE CB.[Id] = 1 
     """
 
     # Load data into a pandas DataFrame
@@ -79,8 +79,6 @@ def chat(input):
 
     custom_rag_prompt = PromptTemplate.from_template(template)
 
-    # question = "Who wrote Prevalence of Uncontrolled Risk Factors for Cardiovascular Disease: United States, 1999-2010"
-
     def format_docs(docs):
         return "\n\n".join(doc.page_content for doc in docs)
 
@@ -92,7 +90,3 @@ def chat(input):
     )
 
     return rag_chain.invoke(input)
-
-
-# response = chat("What is a heart")
-# print(response)
