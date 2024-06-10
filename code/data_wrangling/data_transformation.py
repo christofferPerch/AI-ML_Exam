@@ -1,6 +1,6 @@
 ## DATA TRANSFORMATION ##
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
+# from sklearn.preprocessing import StandardScaler
 
 
 def transform_data(df, predict=False):

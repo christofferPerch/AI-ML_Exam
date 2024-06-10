@@ -60,7 +60,7 @@ percentage = proba_positive_class * 100
 
 
 # Save the model(oversampling model) to a file
-with open("../models/saved_models/model_logistic_regression.pkl", "wb") as file:
-    pickle.dump(log_regressor, file)
-    
+# with open("../models/saved_models/model_logistic_regression.pkl", "wb") as file:
+#     pickle.dump(log_regressor, file)
+
 """ All results can be found inside the directory "./results/model_results.py". """

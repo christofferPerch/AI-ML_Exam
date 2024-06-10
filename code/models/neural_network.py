@@ -8,7 +8,6 @@ from tensorflow.keras.layers import Dense, Dropout, BatchNormalization
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras.metrics import Precision, Recall
 from tensorflow.keras.callbacks import LearningRateScheduler
-import pickle as pkl
 
 
 # Here we make a custom learning rate scheduler function:
@@ -43,7 +42,9 @@ X_train_resampled, y_train_resampled = ros.fit_resample(X_train, y_train)
 model = Sequential(
     [
         Dense(128, activation="relu", input_shape=(X_train_resampled.shape[1],)),
+        # Adjusts the outputs of the previous layer to improve training speed.
         BatchNormalization(),
+        # Randomly ignores 10% of the neurons during training - to reduce overfitting.
         Dropout(0.1),
         Dense(128, activation="relu"),
         BatchNormalization(),
