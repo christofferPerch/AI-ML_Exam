@@ -8,6 +8,7 @@ from tensorflow.keras.layers import Dense, Dropout, BatchNormalization
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras.metrics import Precision, Recall
 from tensorflow.keras.callbacks import LearningRateScheduler
+from sklearn.metrics import classification_report
 
 
 # Here we make a custom learning rate scheduler function:
@@ -24,6 +25,7 @@ lr_scheduler = LearningRateScheduler(scheduler)
 # Loading the dataset:
 df = pd.read_csv("../../data/processed/heart_2022_transformed.csv")
 df_nn = df.copy()
+df_nn = df_nn.replace({"Yes": 1, "No": 0})
 
 # Split data into features and target variables:
 X = df_nn.drop("HadHeartDisease", axis=1)
@@ -42,7 +44,7 @@ X_train_resampled, y_train_resampled = ros.fit_resample(X_train, y_train)
 model = Sequential(
     [
         Dense(128, activation="relu", input_shape=(X_train_resampled.shape[1],)),
-        # Adjusts the outputs of the previous layer to improve training speed.
+        # Adjusts the outputs of the previous layer to stabilize
         BatchNormalization(),
         # Randomly ignores 10% of the neurons during training - to reduce overfitting.
         Dropout(0.1),
@@ -83,9 +85,16 @@ history = model.fit(
     verbose=1,
 )
 
+y_pred = (model.predict(X_test) > 0.5).astype("int32")
+
+# Generate the classification report
+report = classification_report(
+    y_test, y_pred, target_names=["No Heart Disease", "Heart Disease"]
+)
+print(report)
 
 # Save the TensorFlow model to a directory
-model.save("../models/saved_models/model_tensorflow.keras")
+# model.save("../models/saved_models/model_tensorflow.keras")
 
 
 """ All results can be found inside the directory "./results/model_results.py". """

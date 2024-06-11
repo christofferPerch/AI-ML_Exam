@@ -1,5 +1,6 @@
 ## DATA TRANSFORMATION ##
 import pandas as pd
+
 # from sklearn.preprocessing import StandardScaler
 
 
@@ -23,7 +24,7 @@ def transform_data(df, predict=False):
     # ENCODING BINARY VARIABLES #
 
     # Initially we have decided to replace all the existing binary values to 0 and 1's:
-    df = df.replace({"No": 0, "Yes": 1})
+    # df = df.replace({"No": 0, "Yes": 1})
 
     # Encoding "Sex" with 0 and 1's.:
     df["Sex"] = df["Sex"].replace({"Female": 0, "Male": 1})

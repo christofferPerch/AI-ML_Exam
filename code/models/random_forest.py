@@ -40,7 +40,7 @@ print(classification_report(y_test, y_pred_rf))
 
 ## STRATIFIED SAMPLING ##
 # We evaluate the classifier using stratified cross-validation:
-model_to_save = oversampling.perform_stratified_cv(rf_classifier, X, y)
+oversampling.perform_stratified_cv(rf_classifier, X, y)
 
 ## RANDOM OVERSAMPLING ##
 # Here we apply random oversampling to the training set and evaluates it:
@@ -53,8 +53,8 @@ oversampling.perform_random_oversampling(
 oversampling.perform_smote_oversampling(rf_classifier, X_train, X_test, y_train, y_test)
 
 # Save the model(oversampling model) to a file
-with open("../models/saved_models/model_random_forest.pkl", "wb") as file:
-    pkl.dump(model_to_save, file)
+# with open("../models/saved_models/model_random_forest.pkl", "wb") as file:
+#     pkl.dump(model_to_save, file)
 
 
 """ All results can be found inside the directory "./results/model_results.py". """

@@ -30,7 +30,7 @@ log_reg_model = LogisticRegression()
 # We then train the LR model on the training set:
 log_reg_model.fit(X_train, y_train)
 
-# Predicts the text set outcomes:
+# Predicts the test set outcomes:
 y_pred = log_reg_model.predict(X_test)
 
 # Prints classification report for model evaluation:

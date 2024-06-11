@@ -29,7 +29,7 @@ def perform_stratified_cv(model, X, y, n_splits=2, sample_frac=1.0):
     # Initializing stratified k-folds:
     stratified_kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
 
-    # Iterates over each fold, and splits features and target unti training and test sets:
+    # Iterates over each fold, and splits features and target inro training and test sets:
     for i, (train_index, test_index) in enumerate(stratified_kfold.split(X, y)):
         X_train_fold, X_test_fold = X.iloc[train_index], X.iloc[test_index]
         y_train_fold, y_test_fold = y.iloc[train_index], y.iloc[test_index]

@@ -115,7 +115,7 @@ def predict_random_forest():
         df = pd.DataFrame(data, index=[0])  # Assuming data is for a single record
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
-    
+
     # Transform data
     transformed_data = transform_data(df, True)
 

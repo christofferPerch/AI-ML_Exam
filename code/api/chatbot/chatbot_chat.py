@@ -79,6 +79,7 @@ def chat(input):
 
     custom_rag_prompt = PromptTemplate.from_template(template)
 
+    # Format documents to string.
     def format_docs(docs):
         return "\n\n".join(doc.page_content for doc in docs)
 
